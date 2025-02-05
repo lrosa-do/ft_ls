@@ -1,13 +1,24 @@
 # ft_ls
-Its behavior must be identical to the original ls command with the following vari-
-ations:
-◦ Amongst the numerous options available, we are asking you to create the
-following: -l, -R, -a, -r and -t.
-◦ We strongly recommend that you account for the implications of the
-option -R from the very beginning of your code...
-◦ You do not have to deal with the multiple column format for the exit when
-the option -l isn’t in the arguments.
-◦ You are not required to deal with ACL and extended attributes.
-◦ The overall display, depending on each option, must stay as identical as pos-
-sible to the system command. We will be cordial when grading either the
-padding or the pagination, but no information can be missing.
+
+## Description
+This project aims to recreate the behavior of the original `ls` command while adhering to the following constraints and variations.
+
+## Required Features
+- The implementation must support the following options:
+  - `-l` (Long format listing)
+  - `-R` (Recursive listing)
+  - `-a` (Include hidden files)
+  - `-r` (Reverse order)
+  - `-t` (Sort by modification time)
+
+- Consider the implications of the `-R` option from the beginning of the implementation.
+- The output format must closely match that of the system `ls` command.
+
+## Exclusions
+- **Column formatting** is not required when `-l` is **not** specified.
+- **ACL (Access Control Lists) and extended attributes** are not required.
+
+## Evaluation Criteria
+- The output must remain as **identical as possible** to the original `ls`, including spacing and alignment.
+- Padding and pagination will be graded with flexibility, but all required information must be displayed correctly.
+
