@@ -51,6 +51,74 @@ int ft_strcmp(const char *s1, const char *s2)
     return (unsigned char)(*s1) - (unsigned char)(*s2);
 }
 
+char *ft_strdup_peliculas(const char *s)
+{
+    if (!s)
+        return NULL;
+
+    size_t len = ft_strlen(s);
+    int has_space = 0;
+   size_t i;
+
+ 
+    for (i = 0; i < len; i++)
+    {
+        if (s[i] == ' ')
+        {
+            has_space = 1;
+            break;
+        }
+    }
+
+
+    char *copy = malloc(len + (has_space ? 3 : 1));
+    if (!copy)
+        return NULL;
+
+
+    if (has_space)
+    {
+        copy[0] = '\'';
+        ft_strcpy(copy + 1, s);
+        copy[len + 1] = '\'';
+        copy[len + 2] = '\0';
+    }
+    else
+    {
+        ft_strcpy(copy, s);
+    }
+
+    return copy;
+}
+
+int ft_lower(int c)
+{
+    if (c >= 'A' && c <= 'Z')
+        return c + ('a' - 'A');
+    return c;
+}
+
+
+
+int ft_strcasecmp(const char *s1, const char *s2)
+{
+    unsigned char c1, c2;
+
+    while (*s1 || *s2)
+    {
+        c1 = ft_lower((unsigned char)*s1);
+        c2 = ft_lower((unsigned char)*s2);
+
+        if (c1 != c2)
+            return c1 - c2;
+
+        s1++;
+        s2++;
+    }
+    return 0;
+}
+
+
 char *ft_strcat(char *dest, const char *src)
 {
     if (!dest || !src)
@@ -145,9 +213,49 @@ void ft_itoa_buffer(long num, char *buffer)
     }
 }
 
-void ft_print_str(const char *str)
+
+char ft_is_space(const char *s)
 {
-    write(1, str, ft_strlen(str));
+    if (!s)
+        return 0;
+
+    size_t len = ft_strlen(s);
+    char has_space = 0;
+    size_t i;
+
+ 
+    for (i = 0; i < len; i++)
+    {
+        if (s[i] == ' ')
+        {
+            has_space = 1;
+            break;
+        }
+    }
+
+    return has_space;
+}
+
+void ft_print_str(const char *str,char is_name)
+{
+
+    if (!str)
+        return;
+    
+    if ( is_name==1)
+    {
+
+        if (ft_is_space(str) ==1)
+        {
+            write(1, "'", 1);
+            write(1, str, ft_strlen(str));
+            write(1, "'", 1);
+            
+        } else 
+            write(1, str, ft_strlen(str));
+    }
+    else
+        write(1, str, ft_strlen(str));
 }
 
 void ft_error_str(const char *str, const char *err, char nl)

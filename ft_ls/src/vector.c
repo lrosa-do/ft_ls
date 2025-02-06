@@ -51,7 +51,10 @@ void vector_free(t_vector *vector)
     if (!vector->data)
         return;
     for (size_t i = 0; i < vector->size; i++)
-        free_file_info(vector->data[i]);
+    {
+        if (vector->data[i])
+            free_file_info(vector->data[i]);
+    }
 
     free(vector->data);
     vector->data = NULL;
@@ -83,12 +86,14 @@ void vector_free(t_vector *vector)
 // }
 
 
+
 int compare_files(t_file_info *a, t_file_info *b, t_options *opts)
 {
     // if (ft_strcmp(a->name, ".") == 0) return -1;
     // if (ft_strcmp(b->name, ".") == 0) return 1;
     // if (ft_strcmp(a->name, "..") == 0) return -1;
     // if (ft_strcmp(b->name, "..") == 0) return 1;
+
 
     if (opts->t)
     {
@@ -103,7 +108,7 @@ int compare_files(t_file_info *a, t_file_info *b, t_options *opts)
     }
 
     // Comparação por nome ..... >>>ordenação ASCII  `LC_ALL=C`
-    int cmp = ft_strcmp(a->name, b->name);
+    int cmp = ft_strcasecmp(a->name, b->name);
     return (opts->r ? -cmp : cmp);
 }
 

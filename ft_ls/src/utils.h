@@ -38,10 +38,11 @@ int ft_itoa(int n, char *buffer);
 void *ft_memset(void *s, int c, size_t n);
 void *ft_memcpy(void *dest, const void *src, size_t n);
 void ft_itoa_buffer(long num, char *buffer);
-void ft_print_str(const char *str);
+void ft_print_str(const char *str,char is_name);
 void ft_join_path(char *buffer, size_t size, const char *path, const char *name);
 void ft_error_str(const char *str, const char *err, char nl);
-
+int ft_strcasecmp (const char *s1, const char *s2);
+int ft_to_lower(const char* src, char* buffer);
 char *ft_strnew(size_t size);
 char *ft_strjoin(const char *s1, const char *s2);
 char *ft_strsub(const char *s, unsigned int start, size_t len);

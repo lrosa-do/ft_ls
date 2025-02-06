@@ -46,6 +46,18 @@ int read_directory(const char *path, t_vector *vector, t_options *opts)
     return 1;
 }
 
+
+// void print_directory_name(const char *dir_name)
+// {
+//     if (dir_name[0] != '/' && dir_name[0] != '.')
+//     {
+//         ft_print_str("./");
+//     }
+//     write(1, ":", 1);
+//     ft_print_str(dir_name);
+//     write(1, "\n", 1);
+// }
+
 void print_directory_name(const char *dir_name)
 {
     if (dir_name[0] == '/')
@@ -69,9 +81,9 @@ void process_directory(const char *path, t_options *opts,int start,int count)
         vector_free(&vector);
         return;
     }
-
-    vector_sort(&vector, opts);
-
+    if (vector.size > 0)  
+        vector_sort(&vector, opts);
+   
     if (ft_strcmp(path, ".") != 0)
     {
         print_directory_name(path);
@@ -129,7 +141,7 @@ int main(int argc, char **argv)
                 opts.t = 1;
             else
             {
-                ft_error_str("ls: opção inválida -- ", opt, 1);
+                ft_error_str("ft_ls: invalid option -- ", opt, 1);
                 return 1;
             }
             opt++;
@@ -139,22 +151,57 @@ int main(int argc, char **argv)
 
     if (i == argc)
     {
-        if (with_r==1)
+        if (with_r == 1)
         {
             write(1, ".\n", 2);
             write(1, "..\n", 3);
-            with_r =  0;
+            with_r = 0;
         }
-        process_directory(".", &opts,1,i);
+        process_directory(".", &opts, 1, i);
     }
     else
     {
+        int first = 1;
         while (i < argc)
         {
-            process_directory(argv[i], &opts,1,i);
+            struct stat st;
+            
+            if (lstat(argv[i], &st) == -1)
+            {
+                ft_error_str("ft_ls: cannot access '", argv[i], 0);
+                ft_print_str("': No such file or directory\n");
+                //if (first) return 1;
+                i++;
+                continue;
+            }
+            
+            if (!first)
+                write(1, "\n", 1);
+                
+            process_directory(argv[i], &opts, 1, i);
+            first = 0;
             i++;
         }
     }
+   
+    // if (i == argc)
+    // {
+    //     if (with_r==1)
+    //     {
+    //         write(1, ".\n", 2);
+    //         write(1, "..\n", 3);
+    //         with_r =  0;
+    //     }
+    //     process_directory(".", &opts,1,i);
+    // }
+    // else
+    // {
+    //     while (i < argc)
+    //     {
+    //         process_directory(argv[i], &opts,1,i);
+    //         i++;
+    //     }
+    // }
 
     return 0;
 }

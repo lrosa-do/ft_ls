@@ -3,22 +3,22 @@
 #include <grp.h>      //  getgrgid()
 #include <time.h>     //  ctime()
 #include <dirent.h>   //  opendir, readdir, closedir
+ #include <sys/ioctl.h> //bonus ioctl
 #include <unistd.h>
 #include <stdio.h>
 #include "utils.h"
 
-
 void print_filename_colored(t_file_info *file)
 {
-    if (S_ISDIR(file->stats.st_mode))
-        ft_print_str("\033[1;34;44m"); //  Azul com fundo azul
-    else if (S_ISLNK(file->stats.st_mode))
-        ft_print_str("\033[1;36m"); //  Ciano para links simbólicos
-    else
-        ft_print_str("\033[1;32m"); //  Verde para ficheiros normais
+    // if (S_ISDIR(file->stats.st_mode))
+    //     ft_print_str("\033[1;36;35m"); //  Azul com fundo azul
+    // else if (S_ISLNK(file->stats.st_mode))
+    //     ft_print_str("\033[1;36m"); //  Ciano para links simbólicos
+    // else
+    //     ft_print_str("\033[1;32m"); //  Verde para ficheiros normais
 
-    ft_print_str(file->name);
-    ft_print_str("\033[0m");
+    ft_print_str(file->name,1);
+    //    ft_print_str("\033[0m");
 }
 
 void print_file_permissions(long long mode)
@@ -35,13 +35,77 @@ void print_file_permissions(long long mode)
     write(1, (mode & S_IXOTH) ? "x" : "-", 1);
 }
 
+// void print_simple_list(t_vector *vector)
+// {
+//     for (size_t i = 0; i < vector->size; i++)
+//     {
+//         print_filename_colored(vector->data[i]);
+//         write(1, "\n", 1);
+//     }
+// }
+
+// simples
+//  void print_simple_list(t_vector *vector)
+//  {
+//      for (size_t i = 0; i < vector->size; i++)
+//      {
+//          print_filename_colored(vector->data[i]);
+
+//         if (i < vector->size - 1)
+//             write(1, "    ", 4);
+//     }
+
+//     write(1, "\n", 1);
+// }
+
+// bonito mas pode se rmais lento
+
 void print_simple_list(t_vector *vector)
 {
+    struct winsize w;
+    size_t max_name = 0;
+    size_t col_width;
+    size_t cols_per_line;
+
+
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
+
+    for (size_t i = 0; i < vector->size; i++)
+    {
+        size_t len = ft_strlen(vector->data[i]->name);
+        if (len > max_name)
+            max_name = len;
+    }
+
+
+    col_width = max_name + 2;
+
+    // Calcula quantas colunas cabem na linha
+    cols_per_line = w.ws_col / col_width;
+    if (cols_per_line == 0)
+        cols_per_line = 1;
+
     for (size_t i = 0; i < vector->size; i++)
     {
         print_filename_colored(vector->data[i]);
-        write(1, "\n", 1);
+
+
+        if (i < vector->size - 1)
+        {
+            // Se precisamos ir para próxima linha
+            if ((i + 1) % cols_per_line == 0)
+                write(1, "\n", 1);
+            else
+            {
+                // Senão, adiciona padding até próxima coluna
+                size_t padding = col_width - ft_strlen(vector->data[i]->name);
+                while (padding--)
+                    write(1, " ", 1);
+            }
+        }
     }
+    write(1, "\n", 1);
 }
 
 void print_total_blocks(t_vector *vector)
@@ -58,9 +122,9 @@ void print_total_blocks(t_vector *vector)
 
     ft_itoa_buffer(total, str);
 
-    ft_print_str("total ");
-    ft_print_str(str);
-    ft_print_str("\n");
+    ft_print_str("total ",0);
+    ft_print_str(str,1);
+    ft_print_str("\n",0);
 }
 
 char *ft_get_time(time_t tv_sec)
@@ -102,7 +166,6 @@ void calculate_column_widths(t_vector *vector, size_t *link_width,
     {
         t_file_info *file = vector->data[i];
 
-    
         ft_itoa_buffer(file->stats.st_nlink, buffer);
         if (*link_width < ft_strlen(buffer))
             *link_width = ft_strlen(buffer);
@@ -111,18 +174,15 @@ void calculate_column_widths(t_vector *vector, size_t *link_width,
         if (pw && *user_width < ft_strlen(pw->pw_name))
             *user_width = ft_strlen(pw->pw_name);
 
-
         gr = getgrgid(file->stats.st_gid);
         if (gr && *group_width < ft_strlen(gr->gr_name))
             *group_width = ft_strlen(gr->gr_name);
-
 
         ft_itoa_buffer(file->stats.st_size, buffer);
         if (*size_width < ft_strlen(buffer))
             *size_width = ft_strlen(buffer);
     }
 }
-
 
 void print_detailed_list(t_vector *vector)
 {
@@ -149,14 +209,14 @@ void print_detailed_list(t_vector *vector)
         ft_itoa_buffer(file->stats.st_nlink, buffer);
         for (size_t j = ft_strlen(buffer); j < link_width; j++)
             write(1, " ", 1);
-        ft_print_str(buffer);
+        ft_print_str(buffer,0);
         write(1, " ", 1);
 
         // Dono do ficheiro
         pw = getpwuid(file->stats.st_uid);
         if (pw)
         {
-            ft_print_str(pw->pw_name);
+            ft_print_str(pw->pw_name,0);
             for (size_t j = ft_strlen(pw->pw_name); j < user_width + 1; j++)
                 write(1, " ", 1);
         }
@@ -165,7 +225,7 @@ void print_detailed_list(t_vector *vector)
         gr = getgrgid(file->stats.st_gid);
         if (gr)
         {
-            ft_print_str(gr->gr_name);
+            ft_print_str(gr->gr_name,0);
             for (size_t j = ft_strlen(gr->gr_name); j < group_width + 1; j++)
                 write(1, " ", 1);
         }
@@ -174,7 +234,7 @@ void print_detailed_list(t_vector *vector)
         ft_itoa_buffer(file->stats.st_size, buffer);
         for (size_t j = ft_strlen(buffer); j < size_width; j++)
             write(1, " ", 1);
-        ft_print_str(buffer);
+        ft_print_str(buffer,0);
         write(1, " ", 1);
 
         // Data
@@ -193,10 +253,10 @@ void print_detailed_list(t_vector *vector)
             if (link_len != -1)
             {
                 link_target[link_len] = '\0';
-                ft_print_str(" -> ");
-                ft_print_str("\033[1;32m"); 
-                ft_print_str(link_target);
-                ft_print_str("\033[0m");
+                ft_print_str(" -> ",0);
+                //  ft_print_str("\033[1;32m");
+                ft_print_str(link_target,1);
+                //  ft_print_str("\033[0m");
             }
         }
         write(1, "\n", 1);
