@@ -61,11 +61,11 @@ int read_directory(const char *path, t_vector *vector, t_options *opts)
 void print_directory_name(const char *dir_name)
 {
     if (dir_name[0] == '/')
-        ft_print_str(dir_name);
+        ft_print_str(dir_name,1);
     else
     {
      //   ft_print_str("./");
-        ft_print_str(dir_name);
+        ft_print_str(dir_name,1);
     }
     write(1, ":\n", 2);
 }
@@ -169,7 +169,7 @@ int main(int argc, char **argv)
             if (lstat(argv[i], &st) == -1)
             {
                 ft_error_str("ft_ls: cannot access '", argv[i], 0);
-                ft_print_str("': No such file or directory\n");
+                ft_print_str("': No such file or directory\n",0);
                 //if (first) return 1;
                 i++;
                 continue;

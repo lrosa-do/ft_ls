@@ -1,6 +1,6 @@
 NAME = ft_ls
 
-CC = gcc
+CC = clang
 CFLAGS = -Wall -Wextra -Werror -g
 SANITIZE = -fsanitize=address,undefined -fno-omit-frame-pointer
 
